@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPA Intelligence Dashboard · KrugerTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --orange: #ff5b00;
+    --orange-light: #ff7a2e;
+    --orange-dim: rgba(255,91,0,0.08);
+    --orange-mid: rgba(255,91,0,0.18);
+    --bg: #0d0d0f;
+    --surface: #141416;
+    --card: #1a1a1e;
+    --card2: #1f1f24;
+    --border: rgba(255,255,255,0.07);
+    --text: #f4f3f0;
+    --muted: #6b6b75;
+    --muted2: #9998a3;
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --blue: #3b82f6;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -300px; right: -300px;
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(255,91,0,0.04), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,13,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--orange);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Sora', sans-serif;
+    font-weight: 800; font-size: 0.8rem;
+    color: white;
+  }
+  .logo-name {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700; font-size: 0.95rem;
+    color: var(--text);
+  }
+  .logo-sep {
+    width: 1px; height: 20px;
+    background: var(--border);
+  }
+  .logo-sub {
+    font-size: 0.78rem;
+    color: var(--muted2);
+    font-weight: 400;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .last-update {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .btn-refresh {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--muted2);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-refresh:hover { border-color: var(--orange); color: var(--orange); }
+
+  /* ── MAIN ── */
+  .main {
+    position: relative;
+    z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    margin-bottom: 2rem;
+    animation: fadeUp 0.5s ease both;
+  }
+  .page-header h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+  }
+  .page-header h1 span { color: var(--orange); }
+  .page-header p { font-size: 0.88rem; color: var(--muted2); }
+
+  /* ── LOADING STATE ── */
+  #loading-state {
+    text-align: center;
+    padding: 6rem 0;
+  }
+  .loader-ring {
+    width: 48px; height: 48px;
+    border: 3px solid var(--border);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  .loader-text { font-size: 0.88rem; color: var(--muted2); }
+
+  /* ── KPI ROW ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.25rem 1rem;
+    transition: border-color 0.2s;
+    animation: fadeUp 0.5s ease both;
+  }
+  .kpi-card:hover { border-color: rgba(255,91,0,0.3); }
+  .kpi-label {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+  .kpi-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .kpi-value.orange { color: var(--orange); }
+  .kpi-value.green { color: var(--green); }
+  .kpi-value.red { color: var(--red); }
+  .kpi-value.amber { color: var(--amber); }
+  .kpi-sub {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  /* ── CHARTS GRID ── */
+  .charts-row {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .charts-row-2 { grid-template-columns: 1fr 1fr; }
+  .charts-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .charts-row-21 { grid-template-columns: 2fr 1fr; }
+  @media (max-width: 900px) {
+    .charts-row-2, .charts-row-3, .charts-row-21 { grid-template-columns: 1fr; }
+  }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    animation: fadeUp 0.5s ease both;
+  }
+  .chart-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted2);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chart-title::before {
+    content: '';
+    width: 3px; height: 14px;
+    background: var(--orange);
+    border-radius: 2px;
+  }
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  /* ── NIVEL BADGES ── */
+  .nivel-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .nivel-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .nivel-name {
+    font-size: 0.82rem;
+    color: var(--muted2);
+    min-width: 160px;
+    white-space: nowrap;
+  }
+  .nivel-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .nivel-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1s ease 0.3s;
+  }
+  .nivel-pct {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    min-width: 40px;
+    text-align: right;
+  }
+
+  /* ── DIM SCORE BARS ── */
+  .dim-list { display: flex; flex-direction: column; gap: 1rem; }
+  .dim-item { }
+  .dim-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.4rem;
+  }
+  .dim-name {
+    font-size: 0.8rem;
+    color: var(--muted2);
+  }
+  .dim-score {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--orange);
+  }
+  .dim-bg {
+    height: 8px;
+    background: var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .dim-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--orange), var(--orange-light));
+    border-radius: 8px;
+    transition: width 1.2s ease 0.2s;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* staggered delays */
+  .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+  .kpi-card:nth-child(2) { animation-delay: 0.10s; }
+  .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+  .kpi-card:nth-child(4) { animation-delay: 0.20s; }
+  .kpi-card:nth-child(5) { animation-delay: 0.25s; }
+  .chart-card:nth-child(1) { animation-delay: 0.15s; }
+  .chart-card:nth-child(2) { animation-delay: 0.20s; }
+  .chart-card:nth-child(3) { animation-delay: 0.25s; }
+
+  /* ── ERROR STATE ── */
+  .error-state {
+    text-align: center;
+    padding: 4rem 0;
+    display: none;
+  }
+  .error-state p { color: var(--muted2); font-size: 0.9rem; margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-icon">K</div>
+    <span class="logo-name">KrugerTech</span>
+    <div class="logo-sep"></div>
+    <span class="logo-sub">RPA Intelligence Dashboard</span>
+  </div>
+  <div class="topbar-right">
+    <span class="last-update" id="last-update">Cargando...</span>
+    <button class="btn-refresh" onclick="loadData()">↻ Actualizar</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="page-header">
+    <h1>Índice de Madurez de <span>Automatización</span></h1>
+    <p>Métricas agregadas · Sin datos personales · Actualización en tiempo real</p>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading-state">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Cargando datos del Sheet...</div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-state" id="error-state">
+    <div style="font-size:2rem;">⚠️</div>
+    <p>No se pudieron cargar los datos. Verifica la URL del Apps Script.</p>
+  </div>
+
+  <!-- DASHBOARD (oculto hasta que carguen datos) -->
+  <div id="dashboard" style="display:none;">
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Diagnósticos</div>
+        <div class="kpi-value orange" id="kpi-total">—</div>
+        <div class="kpi-sub">respuestas registradas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Score Promedio</div>
+        <div class="kpi-value" id="kpi-score-avg">—</div>
+        <div class="kpi-sub">de 20 puntos posibles</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Madurez Promedio</div>
+        <div class="kpi-value orange" id="kpi-pct-avg">—</div>
+        <div class="kpi-sub">% sobre score máximo</div>
+      </div>
+
+    </div>
+
+    <!-- ROW 1: Niveles + Dimensión crítica -->
+    <div class="charts-row charts-row-21" style="margin-bottom:1rem;">
+
+      <!-- Distribución por niveles -->
+      <div class="chart-card">
+        <div class="chart-title">Distribución por Nivel de Madurez</div>
+        <div class="nivel-list" id="nivel-list"></div>
+      </div>
+
+      <!-- Dimensión más crítica -->
+      <div class="chart-card">
+        <div class="chart-title">Dimensión más Crítica</div>
+        <div id="dim-critica" style="text-align:center; padding: 1rem 0;">
+          <div style="font-size:2.5rem; font-weight:800; color:var(--orange); font-family:'Sora',sans-serif;" id="dim-critica-nombre">—</div>
+          <div style="font-size:0.8rem; color:var(--muted2); margin-top:0.5rem;">mayor score promedio</div>
+          <div style="font-size:3rem; font-weight:800; color:var(--text); font-family:'Sora',sans-serif; margin-top:1rem;" id="dim-critica-score">—</div>
+          <div style="font-size:0.78rem; color:var(--muted); margin-top:0.25rem;">promedio sobre 5</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 2: Radar + Timeline -->
+    <div class="charts-row charts-row-2" style="margin-bottom:1rem;">
+
+      <!-- Radar dimensiones -->
+      <div class="chart-card">
+        <div class="chart-title">Radar de Dimensiones Promedio</div>
+        <div class="chart-wrap" style="height:280px;">
+          <canvas id="chart-radar"></canvas>
+        </div>
+      </div>
+
+      <!-- Timeline score promedio -->
+      <div class="chart-card">
+        <div class="chart-title">Evolución del Score Promedio</div>
+        <div class="chart-wrap" style="height:280px;">
+          <canvas id="chart-timeline"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 3: Histograma + Dimensiones barras -->
+    <div class="charts-row charts-row-2" style="margin-bottom:1rem;">
+
+      <!-- Histograma de scores -->
+      <div class="chart-card">
+        <div class="chart-title">Distribución de Scores</div>
+        <div class="chart-wrap" style="height:220px;">
+          <canvas id="chart-hist"></canvas>
+        </div>
+      </div>
+
+<!-- Score promedio por dimensión -->
+      <div class="chart-card">
+        <div class="chart-title">Score Promedio por Dimensión</div>
+        <div class="dim-list" id="dim-list"></div>
+      </div>
+
+    </div>
+
+    <!-- ROW 4: Respuestas por semana + Distribución dimensiones -->
+    <div class="charts-row charts-row-2">
+
+      <!-- Respuestas por semana -->
+      <div class="chart-card">
+        <div class="chart-title">Diagnósticos por Semana</div>
+        <div class="chart-wrap" style="height:220px;">
+          <canvas id="chart-weekly"></canvas>
+        </div>
+      </div>
+
+      <!-- Distribución de scores por dimensión (boxplot simulado con barras) -->
+      <div class="chart-card">
+        <div class="chart-title">Score por Dimensión — Detalle %</div>
+        <div class="chart-wrap" style="height:220px;">
+          <canvas id="chart-dims-bar"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /dashboard -->
+</div><!-- /main -->
+
+<script>
+// ── CONFIGURACIÓN ─────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZ7oq50irHhwrPzgquWAxmF4O9H_77eQH3ArshXjrWvzp1wGb4-gDjneUysYtotxOM/exec';
+
+// Chart.js defaults
+Chart.defaults.color = '#6b6b75';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size = 11;
+
+let charts = {};
+
+// ── LOAD DATA ─────────────────────────────────────────────────
+async function loadData() {
+  document.getElementById('loading-state').style.display = 'block';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('error-state').style.display = 'none';
+
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    const rows = json.data || [];
+
+    if (rows.length === 0) {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('error-state').style.display = 'block';
+      document.getElementById('error-state').querySelector('p').textContent = 'No hay datos registrados aún.';
+      return;
+    }
+
+    renderDashboard(rows);
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('last-update').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-EC');
+
+  } catch(err) {
+    console.error(err);
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('error-state').style.display = 'block';
+  }
+}
+
+// ── RENDER DASHBOARD ──────────────────────────────────────────
+function renderDashboard(rows) {
+  // Destruir charts previos si existen
+  Object.values(charts).forEach(c => c.destroy());
+  charts = {};
+
+  // ── Parsear datos ──
+  const scores = rows.map(r => Number(r.score_total) || 0);
+  const pcts   = rows.map(r => Number(r.score_pct) || 0);
+  const niveles = rows.map(r => r.nivel || '');
+  const dimKeys = ['dim_dependencia','dim_conocimiento','dim_complejidad','dim_calidad'];
+  const dimLabels = ['Dependencia Manual','Conocimiento Crítico','Complejidad / Volumen','Calidad y Riesgo'];
+  const dimShort  = ['Dep. Manual','Con. Crítico','Comp. Volumen','Cal. Riesgo'];
+
+  const dimAvgs = dimKeys.map(k => {
+    const vals = rows.map(r => Number(r[k]) || 0);
+    return +(vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(2);
+  });
+
+  // ── KPIs ──
+  const total = rows.length;
+  const scoreAvg = +(scores.reduce((a,b)=>a+b,0)/total).toFixed(1);
+  const pctAvg   = +(pcts.reduce((a,b)=>a+b,0)/total).toFixed(1);
+  document.getElementById('kpi-total').textContent = total;
+  document.getElementById('kpi-score-avg').textContent = scoreAvg;
+  document.getElementById('kpi-pct-avg').textContent = pctAvg + '%';
+
+  // ── Distribución niveles ──
+  const nivelColors = {
+    'Procesos estructurados': '#22c55e',
+    'Punto de inflexión': '#f59e0b',
+    'Alta dependencia manual': '#ff5b00',
+    'Riesgo operacional crítico': '#ef4444'
+  };
+  const nivelCounts = {};
+  niveles.forEach(n => { nivelCounts[n] = (nivelCounts[n]||0)+1; });
+  const nivelList = document.getElementById('nivel-list');
+  nivelList.innerHTML = '';
+  Object.entries(nivelCounts).sort((a,b)=>b[1]-a[1]).forEach(([name, count]) => {
+    const pct = +((count/total)*100).toFixed(1);
+    const color = nivelColors[name] || '#ff5b00';
+    nivelList.innerHTML += `
+      <div class="nivel-item">
+        <div class="nivel-name">${name}</div>
+        <div class="nivel-bar-bg">
+          <div class="nivel-bar-fill" style="width:${pct}%; background:${color};"></div>
+        </div>
+        <div class="nivel-pct" style="color:${color};">${pct}%</div>
+      </div>`;
+  });
+
+  // ── Dimensión más crítica ──
+  const maxIdx = dimAvgs.indexOf(Math.max(...dimAvgs));
+  document.getElementById('dim-critica-nombre').textContent = dimShort[maxIdx];
+  document.getElementById('dim-critica-score').textContent = dimAvgs[maxIdx] + '/5';
+
+  // ── Score promedio por dimensión (barras) ──
+  const dimListEl = document.getElementById('dim-list');
+  dimListEl.innerHTML = '';
+  dimKeys.forEach((k, i) => {
+    const pct = (dimAvgs[i]/5)*100;
+    dimListEl.innerHTML += `
+      <div class="dim-item">
+        <div class="dim-header">
+          <div class="dim-name">${dimLabels[i]}</div>
+          <div class="dim-score">${dimAvgs[i]}/5</div>
+        </div>
+        <div class="dim-bg">
+          <div class="dim-fill" style="width:${pct}%;"></div>
+        </div>
+      </div>`;
+  });
+
+  // ── CHART: Radar ──
+  charts.radar = new Chart(document.getElementById('chart-radar'), {
+    type: 'radar',
+    data: {
+      labels: dimLabels,
+      datasets: [{
+        label: 'Promedio',
+        data: dimAvgs,
+        backgroundColor: 'rgba(255,91,0,0.15)',
+        borderColor: '#ff5b00',
+        borderWidth: 2,
+        pointBackgroundColor: '#ff5b00',
+        pointRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          min: 0, max: 5,
+          ticks: { stepSize: 1, color: '#6b6b75', backdropColor: 'transparent' },
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          angleLines: { color: 'rgba(255,255,255,0.06)' },
+          pointLabels: { color: '#9998a3', font: { size: 11 } }
+        }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // ── CHART: Timeline score promedio por día ──
+  const byDay = {};
+  rows.forEach(r => {
+    const raw = r.timestamp || '';
+    let dateKey = '';
+    if (raw.includes('/')) {
+      const parts = raw.split(' ')[0].split('/');
+      dateKey = parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : raw.split(' ')[0];
+    } else {
+      dateKey = raw.split('T')[0];
+    }
+    if (!dateKey) return;
+    if (!byDay[dateKey]) byDay[dateKey] = [];
+    byDay[dateKey].push(Number(r.score_total)||0);
+  });
+  const sortedDays = Object.keys(byDay).sort();
+  const dayAvgs = sortedDays.map(d => +(byDay[d].reduce((a,b)=>a+b,0)/byDay[d].length).toFixed(1));
+
+  charts.timeline = new Chart(document.getElementById('chart-timeline'), {
+    type: 'line',
+    data: {
+      labels: sortedDays,
+      datasets: [{
+        label: 'Score promedio',
+        data: dayAvgs,
+        borderColor: '#ff5b00',
+        backgroundColor: 'rgba(255,91,0,0.1)',
+        borderWidth: 2,
+        pointBackgroundColor: '#ff5b00',
+        pointRadius: 3,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { min: 0, max: 20, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b6b75' } },
+        x: { grid: { display: false }, ticks: { color: '#6b6b75', maxRotation: 45 } }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // ── CHART: Histograma de scores ──
+  const buckets = ['1-4','5-8','9-12','13-16','17-20'];
+  const bucketCounts = [0,0,0,0,0];
+  scores.forEach(s => {
+    if (s <= 4) bucketCounts[0]++;
+    else if (s <= 8) bucketCounts[1]++;
+    else if (s <= 12) bucketCounts[2]++;
+    else if (s <= 16) bucketCounts[3]++;
+    else bucketCounts[4]++;
+  });
+
+  charts.hist = new Chart(document.getElementById('chart-hist'), {
+    type: 'bar',
+    data: {
+      labels: buckets,
+      datasets: [{
+        label: 'Diagnósticos',
+        data: bucketCounts,
+        backgroundColor: ['#22c55e','#84cc16','#f59e0b','#ff5b00','#ef4444'],
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b6b75', stepSize: 1 } },
+        x: { grid: { display: false }, ticks: { color: '#6b6b75' } }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // ── CHART: Respuestas por semana ──
+  const byWeek = {};
+  rows.forEach(r => {
+    const raw = r.timestamp || '';
+    let d;
+    if (raw.includes('/')) {
+      const parts = raw.split(' ')[0].split('/');
+      d = parts.length === 3 ? new Date(`${parts[2]}-${parts[1]}-${parts[0]}`) : new Date();
+    } else {
+      d = new Date(raw);
+    }
+    if (isNaN(d)) return;
+    const week = getWeekKey(d);
+    byWeek[week] = (byWeek[week]||0)+1;
+  });
+  const sortedWeeks = Object.keys(byWeek).sort();
+
+  charts.weekly = new Chart(document.getElementById('chart-weekly'), {
+    type: 'bar',
+    data: {
+      labels: sortedWeeks,
+      datasets: [{
+        label: 'Diagnósticos',
+        data: sortedWeeks.map(w => byWeek[w]),
+        backgroundColor: 'rgba(255,91,0,0.7)',
+        borderColor: '#ff5b00',
+        borderWidth: 1,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b6b75', stepSize: 1 } },
+        x: { grid: { display: false }, ticks: { color: '#6b6b75', maxRotation: 45 } }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  // ── CHART: Score por dimensión barras agrupadas ──
+  const dimPctAvgs = dimAvgs.map(a => +((a/5)*100).toFixed(1));
+
+  charts.dimsBar = new Chart(document.getElementById('chart-dims-bar'), {
+    type: 'bar',
+    data: {
+      labels: dimShort,
+      datasets: [{
+        label: '% Promedio',
+        data: dimPctAvgs,
+        backgroundColor: dimPctAvgs.map(v =>
+          v >= 80 ? '#ef4444' : v >= 60 ? '#ff5b00' : v >= 40 ? '#f59e0b' : '#22c55e'
+        ),
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      scales: {
+        x: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6b6b75', callback: v => v+'%' } },
+        y: { grid: { display: false }, ticks: { color: '#9998a3' } }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+function getWeekKey(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const mon = new Date(d.setDate(diff));
+  return mon.toISOString().split('T')[0];
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
