@@ -13,16 +13,16 @@
     --orange-light: #FF7A2E;
     --orange-pale:  #FFF3ED;
     --orange-dim:   rgba(255,91,0,0.08);
-    --orange-mid:   rgba(255,91,0,0.15);
+    --orange-mid:   rgba(255,91,0,0.18);
     --dark:         #21272A;
     --dark2:        #2E363A;
     --dark3:        #3C464B;
     --bg:           #F7F6F4;
-    --surface:      #FFFFFF;
     --card:         #FFFFFF;
     --card2:        #F2F1EF;
     --border:       #E8E5E0;
-    --border2:      rgba(255,91,0,0.2);
+    --border-dark:  rgba(255,255,255,0.08);
+    --border2:      rgba(255,91,0,0.22);
     --text:         #21272A;
     --text2:        #3C464B;
     --muted:        #8A9099;
@@ -45,54 +45,55 @@
   body::before {
     content: '';
     position: fixed; inset: 0;
-    background-image:
-      radial-gradient(circle at 90% 5%, rgba(255,91,0,0.04) 0%, transparent 40%),
-      radial-gradient(circle at 10% 90%, rgba(33,39,42,0.03) 0%, transparent 40%);
+    background-image: radial-gradient(circle at 85% 10%, rgba(255,91,0,0.04) 0%, transparent 38%);
     pointer-events: none; z-index: 0;
   }
 
-  /* ── TOPBAR ── */
+  /* ══════════════════════════════════
+     TOPBAR — dark
+  ══════════════════════════════════ */
   .topbar {
     position: sticky; top: 0; z-index: 100;
-    background: rgba(255,255,255,0.94);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+    background: #0f1315;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
     padding: 0 2.5rem;
     height: 64px;
     display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 1px 4px rgba(33,39,42,0.06);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
   }
   .topbar-left { display: flex; align-items: center; gap: 14px; }
-  .logo-img { height: 34px; width: auto; display: block; object-fit: contain; }
-  .logo-sep { width: 1px; height: 22px; background: var(--border); }
-  .logo-sub { font-size: 0.75rem; color: var(--muted2); font-weight: 500; letter-spacing: 0.3px; }
+  .logo-img { height: 32px; width: auto; display: block; object-fit: contain; }
+  .logo-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.12); }
+  .logo-sub { font-size: 0.75rem; color: rgba(255,255,255,0.45); font-weight: 500; letter-spacing: 0.3px; }
   .topbar-right { display: flex; align-items: center; gap: 14px; }
-  .last-update { font-size: 0.72rem; color: var(--muted); }
+  .last-update { font-size: 0.72rem; color: rgba(255,255,255,0.35); }
   .btn-refresh {
-    background: var(--card2); border: 1px solid var(--border); color: var(--muted2);
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.55);
     border-radius: 8px; padding: 7px 16px;
     font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600;
     cursor: pointer; transition: all 0.2s;
     display: flex; align-items: center; gap: 6px;
   }
-  .btn-refresh:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-pale); }
+  .btn-refresh:hover { border-color: var(--orange); color: var(--orange); background: rgba(255,91,0,0.08); }
 
   /* ── MAIN ── */
   .main { position: relative; z-index: 1; width: 100%; padding: 2.5rem 2.5rem 5rem; }
 
   /* ── PAGE HEADER ── */
   .page-header {
-    margin-bottom: 2.5rem; animation: fadeUp 0.5s ease both;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.5s ease both;
     display: flex; align-items: flex-end; justify-content: space-between;
     flex-wrap: wrap; gap: 1rem;
   }
   .page-header-left h1 {
-    font-size: clamp(1.6rem, 2.4vw, 2.4rem); font-weight: 900;
+    font-size: clamp(1.5rem, 2.2vw, 2.2rem); font-weight: 900;
     line-height: 1.1; color: var(--dark); letter-spacing: -0.5px;
   }
   .page-header-left h1 span { color: var(--orange); }
-  .page-header-left p { font-size: 0.84rem; color: var(--muted2); margin-top: 0.35rem; font-weight: 400; }
+  .page-header-left p { font-size: 0.84rem; color: var(--muted2); margin-top: 0.3rem; }
   .header-badge {
     display: inline-flex; align-items: center; gap: 6px;
     background: var(--orange-pale); border: 1px solid var(--border2);
@@ -105,79 +106,106 @@
     background: var(--orange); border-radius: 50%;
     animation: pulse 2s ease infinite;
   }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.4; transform: scale(0.75); }
-  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.75)} }
 
   /* ── LOADING / ERROR ── */
   #loading-state { text-align: center; padding: 6rem 0; }
   .loader-ring {
     width: 48px; height: 48px; border: 3px solid var(--border);
     border-top-color: var(--orange); border-radius: 50%;
-    animation: spin 0.85s linear infinite; margin: 0 auto 1rem;
+    animation: spin .85s linear infinite; margin: 0 auto 1rem;
   }
-  .loader-text { font-size: 0.88rem; color: var(--muted2); }
+  .loader-text { font-size: .88rem; color: var(--muted2); }
   .error-state { text-align: center; padding: 4rem 0; display: none; }
-  .error-state p { color: var(--muted2); font-size: 0.9rem; margin-top: 0.5rem; }
+  .error-state p { color: var(--muted2); font-size: .9rem; margin-top: .5rem; }
 
-  /* ── KPI ── */
-  .kpi-wrapper { display: flex; justify-content: center; margin-bottom: 2rem; }
-  .kpi-grid {
+  /* ══════════════════════════════════════════════
+     TOP ZONE — two columns:
+     LEFT  = radar (fills height)
+     RIGHT = 3 KPI cards stacked
+  ══════════════════════════════════════════════ */
+  .top-zone {
     display: grid;
-    grid-template-columns: repeat(3, minmax(240px, 380px));
-    gap: 1.25rem; width: 100%; max-width: 1200px;
+    grid-template-columns: 1fr 300px;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+    align-items: start;
   }
-  @media (max-width: 860px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 540px) { .kpi-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 960px) { .top-zone { grid-template-columns: 1fr; } }
 
+  /* Radar card */
+  .radar-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: 0 2px 8px rgba(33,39,42,.05);
+    transition: border-color .25s, box-shadow .25s;
+    animation: fadeUp .5s ease both;
+  }
+  .radar-card:hover { border-color: var(--border2); box-shadow: 0 6px 24px rgba(255,91,0,.07); }
+
+  /* KPI stack */
+  .kpi-stack {
+    display: flex; flex-direction: column; gap: 1rem;
+    animation: fadeUp .5s .08s ease both;
+  }
   .kpi-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 20px;
-    padding: 2rem 2rem 1.75rem; text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem 1.1rem;
     position: relative; overflow: hidden;
-    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
-    animation: fadeUp 0.5s ease both;
-    box-shadow: 0 2px 8px rgba(33,39,42,0.06);
+    transition: border-color .25s, transform .25s, box-shadow .25s;
+    box-shadow: 0 2px 8px rgba(33,39,42,.05);
   }
-  .kpi-card:hover { border-color: var(--border2); transform: translateY(-3px); box-shadow: 0 12px 36px rgba(255,91,0,0.10); }
+  .kpi-card:hover { border-color: var(--border2); transform: translateX(3px); box-shadow: 0 6px 24px rgba(255,91,0,.10); }
+  /* left orange accent bar */
   .kpi-card::before {
-    content: ''; position: absolute; top: 0; left: 10%; right: 10%;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, var(--orange), transparent);
-    border-radius: 0 0 4px 4px;
+    content: '';
+    position: absolute; top: 12%; left: 0; bottom: 12%;
+    width: 3px;
+    background: linear-gradient(180deg, var(--orange), var(--orange-light));
+    border-radius: 0 3px 3px 0;
   }
-  .kpi-icon {
-    width: 46px; height: 46px; background: var(--orange-pale);
-    border: 1px solid var(--border2); border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.25rem; margin: 0 auto 1.1rem;
-  }
+  .kpi-inner { padding-left: 0.75rem; }
   .kpi-label {
-    font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1.4px; color: var(--muted); margin-bottom: 0.65rem;
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.4px; color: var(--muted); margin-bottom: 0.3rem;
   }
   .kpi-value {
-    font-size: clamp(2.4rem, 3.5vw, 3.4rem); font-weight: 900; color: var(--dark);
-    line-height: 1; margin-bottom: 0.4rem; letter-spacing: -1px;
+    font-size: 2.6rem; font-weight: 900; color: var(--dark);
+    line-height: 1; letter-spacing: -1.5px; margin-bottom: 0.25rem;
   }
   .kpi-value.orange { color: var(--orange); }
-  .kpi-sub { font-size: 0.74rem; color: var(--muted); font-weight: 400; }
+  .kpi-sub { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
 
-  /* ── CHARTS ── */
+  /* ══════════════════════════════════
+     ANALYSIS SECTION — below
+  ══════════════════════════════════ */
+  .section-label {
+    font-size: .65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.5px; color: var(--muted);
+    margin: 1.75rem 0 1rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
   .charts-row { display: grid; gap: 1.25rem; margin-bottom: 1.25rem; }
   .charts-row-2  { grid-template-columns: 1fr 1fr; }
   .charts-row-21 { grid-template-columns: 2fr 1fr; }
-  @media (max-width: 960px) { .charts-row-2, .charts-row-21 { grid-template-columns: 1fr; } }
+  @media (max-width: 960px) { .charts-row-2,.charts-row-21 { grid-template-columns: 1fr; } }
 
   .chart-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 20px;
-    padding: 1.75rem; animation: fadeUp 0.5s ease both;
-    transition: border-color 0.25s, box-shadow 0.25s;
-    box-shadow: 0 2px 8px rgba(33,39,42,0.05);
+    padding: 1.75rem; animation: fadeUp .5s ease both;
+    transition: border-color .25s, box-shadow .25s;
+    box-shadow: 0 2px 8px rgba(33,39,42,.05);
   }
-  .chart-card:hover { border-color: var(--border2); box-shadow: 0 6px 24px rgba(255,91,0,0.07); }
+  .chart-card:hover { border-color: var(--border2); box-shadow: 0 6px 24px rgba(255,91,0,.07); }
+
   .chart-title {
-    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    font-size: .72rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: 1.3px; color: var(--muted2); margin-bottom: 1.5rem;
     display: flex; align-items: center; gap: 10px;
   }
@@ -191,69 +219,58 @@
   /* ── NIVEL LIST ── */
   .nivel-list { display: flex; flex-direction: column; gap: 1rem; }
   .nivel-item { display: flex; align-items: center; gap: 1rem; }
-  .nivel-name { font-size: 0.82rem; color: var(--text2); min-width: 190px; white-space: nowrap; font-weight: 500; }
+  .nivel-name { font-size: .82rem; color: var(--text2); min-width: 190px; white-space: nowrap; font-weight: 500; }
   .nivel-bar-bg { flex: 1; height: 7px; background: var(--card2); border-radius: 7px; overflow: hidden; }
-  .nivel-bar-fill { height: 100%; border-radius: 7px; transition: width 1s ease 0.3s; }
-  .nivel-pct { font-size: 0.82rem; font-weight: 700; min-width: 44px; text-align: right; }
+  .nivel-bar-fill { height: 100%; border-radius: 7px; transition: width 1s ease .3s; }
+  .nivel-pct { font-size: .82rem; font-weight: 700; min-width: 44px; text-align: right; }
 
   /* ── DIM CRÍTICA ── */
   .dim-critica-inner {
     display: flex; flex-direction: column; align-items: center;
-    justify-content: center; padding: 1.5rem 0; gap: 0.4rem;
+    justify-content: center; padding: 1.5rem 0; gap: .4rem;
   }
   .dim-critica-badge {
     background: var(--orange-pale); border: 1px solid var(--border2);
     border-radius: 50px; padding: 4px 14px;
-    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1px; color: var(--orange); margin-bottom: 0.5rem;
+    font-size: .65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--orange); margin-bottom: .5rem;
   }
   #dim-critica-nombre {
-    font-size: clamp(1.5rem, 2.5vw, 2.2rem); font-weight: 900;
-    color: var(--orange); text-align: center; line-height: 1.1; letter-spacing: -0.5px;
+    font-size: clamp(1.4rem, 2.2vw, 2rem); font-weight: 900;
+    color: var(--orange); text-align: center; line-height: 1.1; letter-spacing: -.5px;
   }
-  .dim-critica-label { font-size: 0.76rem; color: var(--muted2); font-weight: 400; }
+  .dim-critica-label { font-size: .76rem; color: var(--muted2); font-weight: 400; }
   #dim-critica-score {
-    font-size: clamp(2.4rem, 3.5vw, 3.4rem); font-weight: 900;
-    color: var(--dark); line-height: 1; margin-top: 0.75rem; letter-spacing: -1px;
+    font-size: clamp(2.2rem, 3vw, 3rem); font-weight: 900;
+    color: var(--dark); line-height: 1; margin-top: .75rem; letter-spacing: -1px;
   }
-  .dim-critica-sublabel { font-size: 0.72rem; color: var(--muted); }
+  .dim-critica-sublabel { font-size: .72rem; color: var(--muted); }
 
   /* ── DIM BARS ── */
   .dim-list { display: flex; flex-direction: column; gap: 1.1rem; }
-  .dim-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.45rem; }
-  .dim-name { font-size: 0.82rem; color: var(--text2); font-weight: 500; }
-  .dim-score { font-size: 0.82rem; font-weight: 700; color: var(--orange); }
+  .dim-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .45rem; }
+  .dim-name { font-size: .82rem; color: var(--text2); font-weight: 500; }
+  .dim-score { font-size: .82rem; font-weight: 700; color: var(--orange); }
   .dim-bg { height: 8px; background: var(--card2); border-radius: 8px; overflow: hidden; }
   .dim-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--orange), var(--orange-light));
-    border-radius: 8px; transition: width 1.2s ease 0.2s;
+    border-radius: 8px; transition: width 1.2s ease .2s;
   }
-
-  /* ── SECTION DIVIDER ── */
-  .section-label {
-    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1.5px; color: var(--muted);
-    margin: 2rem 0 1rem;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
   /* ── ANIMATIONS ── */
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .kpi-card:nth-child(1) { animation-delay: 0.05s; }
-  .kpi-card:nth-child(2) { animation-delay: 0.12s; }
-  .kpi-card:nth-child(3) { animation-delay: 0.19s; }
-  .chart-card:nth-child(1) { animation-delay: 0.15s; }
-  .chart-card:nth-child(2) { animation-delay: 0.22s; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes spin   { to{transform:rotate(360deg)} }
 </style>
 </head>
 <body>
 
+<!-- TOPBAR — dark -->
 <div class="topbar">
   <div class="topbar-left">
-    <img src="https://res.cloudinary.com/dwcqgcl0m/image/upload/q_auto/f_auto/v1776721583/krugercorp_logo_ly65c3.jpg" alt="KrugerCorp" class="logo-img">
+    <img
+      src="https://res.cloudinary.com/dwcqgcl0m/image/upload/q_auto/f_auto/v1776721583/krugercorp_logo_ly65c3.jpg"
+      alt="KrugerCorp" class="logo-img">
     <div class="logo-sep"></div>
     <span class="logo-sub">RPA Intelligence Dashboard</span>
   </div>
@@ -263,7 +280,9 @@
   </div>
 </div>
 
+<!-- MAIN -->
 <div class="main">
+
   <div class="page-header">
     <div class="page-header-left">
       <h1>Índice de Madurez de <span>Automatización</span></h1>
@@ -277,29 +296,45 @@
 
   <div id="dashboard" style="display:none;">
 
-    <div class="kpi-wrapper">
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-icon">📋</div>
-          <div class="kpi-label">Total Diagnósticos</div>
-          <div class="kpi-value orange" id="kpi-total">—</div>
-          <div class="kpi-sub">respuestas registradas</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon">🎯</div>
-          <div class="kpi-label">Score Promedio</div>
-          <div class="kpi-value" id="kpi-score-avg">—</div>
-          <div class="kpi-sub">de 20 puntos posibles</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon">📈</div>
-          <div class="kpi-label">Madurez Promedio</div>
-          <div class="kpi-value orange" id="kpi-pct-avg">—</div>
-          <div class="kpi-sub">% sobre score máximo</div>
+    <!-- ══ TOP ZONE: Radar (izquierda) + KPIs apilados (derecha) ══ -->
+    <div class="top-zone">
+
+      <!-- Radar -->
+      <div class="radar-card">
+        <div class="chart-title">Radar de Dimensiones Promedio</div>
+        <div class="chart-wrap" style="height:340px;">
+          <canvas id="chart-radar"></canvas>
         </div>
       </div>
-    </div>
 
+      <!-- KPI stack -->
+      <div class="kpi-stack">
+        <div class="kpi-card">
+          <div class="kpi-inner">
+            <div class="kpi-label">Total Diagnósticos</div>
+            <div class="kpi-value orange" id="kpi-total">—</div>
+            <div class="kpi-sub">respuestas registradas</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-inner">
+            <div class="kpi-label">Score Promedio</div>
+            <div class="kpi-value" id="kpi-score-avg">—</div>
+            <div class="kpi-sub">de 20 puntos posibles</div>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-inner">
+            <div class="kpi-label">Madurez Promedio</div>
+            <div class="kpi-value orange" id="kpi-pct-avg">—</div>
+            <div class="kpi-sub">% sobre score máximo</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /top-zone -->
+
+    <!-- ══ ANÁLISIS DE MADUREZ ══ -->
     <div class="section-label">Análisis de madurez</div>
 
     <div class="charts-row charts-row-21">
@@ -321,12 +356,12 @@
 
     <div class="charts-row charts-row-2">
       <div class="chart-card">
-        <div class="chart-title">Radar de Dimensiones Promedio</div>
-        <div class="chart-wrap" style="height:300px;"><canvas id="chart-radar"></canvas></div>
+        <div class="chart-title">Evolución del Score Promedio</div>
+        <div class="chart-wrap" style="height:260px;"><canvas id="chart-timeline"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Evolución del Score Promedio</div>
-        <div class="chart-wrap" style="height:300px;"><canvas id="chart-timeline"></canvas></div>
+        <div class="chart-title">Score Promedio por Dimensión</div>
+        <div class="dim-list" id="dim-list"></div>
       </div>
     </div>
 
@@ -338,24 +373,20 @@
         <div class="chart-wrap" style="height:240px;"><canvas id="chart-hist"></canvas></div>
       </div>
       <div class="chart-card">
-        <div class="chart-title">Score Promedio por Dimensión</div>
-        <div class="dim-list" id="dim-list"></div>
-      </div>
-    </div>
-
-    <div class="charts-row charts-row-2">
-      <div class="chart-card">
-        <div class="chart-title">Diagnósticos por Semana</div>
-        <div class="chart-wrap" style="height:240px;"><canvas id="chart-weekly"></canvas></div>
-      </div>
-      <div class="chart-card">
         <div class="chart-title">Score por Dimensión — Detalle %</div>
         <div class="chart-wrap" style="height:240px;"><canvas id="chart-dims-bar"></canvas></div>
       </div>
     </div>
 
-  </div>
-</div>
+    <div class="charts-row" style="grid-template-columns:1fr;">
+      <div class="chart-card">
+        <div class="chart-title">Diagnósticos por Semana</div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="chart-weekly"></canvas></div>
+      </div>
+    </div>
+
+  </div><!-- /dashboard -->
+</div><!-- /main -->
 
 <script>
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZ7oq50irHhwrPzgquWAxmF4O9H_77eQH3ArshXjrWvzp1wGb4-gDjneUysYtotxOM/exec';
@@ -392,6 +423,7 @@ async function loadData() {
 
 function renderDashboard(rows) {
   Object.values(charts).forEach(c => c.destroy()); charts = {};
+
   const norm = rows.map(r => ({
     timestamp:        r.timestamp        || r['Fecha y hora']                     || '',
     score_total:      Number(r.score_total      || r['Score Total'])               || 0,
@@ -402,99 +434,159 @@ function renderDashboard(rows) {
     dim_complejidad:  Number(r.dim_complejidad  || r['Complejidad y volumen (pts)'])|| 0,
     dim_calidad:      Number(r.dim_calidad      || r['Calidad y riesgo (pts)'])    || 0,
   }));
+
   const scores  = norm.map(r => r.score_total);
   const pcts    = norm.map(r => r.score_pct);
   const niveles = norm.map(r => r.nivel);
   const dimKeys   = ['dim_dependencia','dim_conocimiento','dim_complejidad','dim_calidad'];
   const dimLabels = ['Dependencia Manual','Conocimiento Crítico','Complejidad / Volumen','Calidad y Riesgo'];
   const dimShort  = ['Dep. Manual','Con. Crítico','Comp. Volumen','Cal. Riesgo'];
+
   const dimAvgs = dimKeys.map(k => {
     const vals = norm.map(r => r[k]);
     return +(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2);
   });
+
   const total    = rows.length;
   const scoreAvg = +(scores.reduce((a,b)=>a+b,0)/total).toFixed(1);
   const pctAvg   = +(pcts.reduce((a,b)=>a+b,0)/total).toFixed(1);
+
   document.getElementById('kpi-total').textContent     = total;
   document.getElementById('kpi-score-avg').textContent = scoreAvg;
   document.getElementById('kpi-pct-avg').textContent   = pctAvg + '%';
 
+  // ── Niveles ──
   const nivelColors = {
-    'Procesos estructurados': '#16a34a', 'Punto de inflexión': '#d97706',
-    'Alta dependencia manual': '#FF5B00', 'Riesgo operacional crítico': '#dc2626'
+    'Procesos estructurados':'#16a34a','Punto de inflexión':'#d97706',
+    'Alta dependencia manual':'#FF5B00','Riesgo operacional crítico':'#dc2626'
   };
   const nivelCounts = {};
   niveles.forEach(n => { nivelCounts[n] = (nivelCounts[n]||0)+1; });
   const nivelList = document.getElementById('nivel-list');
   nivelList.innerHTML = '';
   Object.entries(nivelCounts).sort((a,b)=>b[1]-a[1]).forEach(([name, count]) => {
-    const pct = +((count/total)*100).toFixed(1);
+    const pct   = +((count/total)*100).toFixed(1);
     const color = nivelColors[name] || '#FF5B00';
-    nivelList.innerHTML += `<div class="nivel-item"><div class="nivel-name">${name}</div><div class="nivel-bar-bg"><div class="nivel-bar-fill" style="width:${pct}%;background:${color};"></div></div><div class="nivel-pct" style="color:${color};">${pct}%</div></div>`;
+    nivelList.innerHTML += `
+      <div class="nivel-item">
+        <div class="nivel-name">${name}</div>
+        <div class="nivel-bar-bg"><div class="nivel-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+        <div class="nivel-pct" style="color:${color};">${pct}%</div>
+      </div>`;
   });
 
+  // ── Dimensión más crítica = MENOR promedio ──
   const minIdx = dimAvgs.indexOf(Math.min(...dimAvgs));
   document.getElementById('dim-critica-nombre').textContent = dimShort[minIdx];
   document.getElementById('dim-critica-score').textContent  = dimAvgs[minIdx] + '/5';
 
+  // ── Barras por dimensión ──
   const dimListEl = document.getElementById('dim-list');
   dimListEl.innerHTML = '';
   dimKeys.forEach((k, i) => {
     const pct = (dimAvgs[i]/5)*100;
-    dimListEl.innerHTML += `<div class="dim-item"><div class="dim-header"><div class="dim-name">${dimLabels[i]}</div><div class="dim-score">${dimAvgs[i]}/5</div></div><div class="dim-bg"><div class="dim-fill" style="width:${pct}%;"></div></div></div>`;
+    dimListEl.innerHTML += `
+      <div class="dim-item">
+        <div class="dim-header">
+          <div class="dim-name">${dimLabels[i]}</div>
+          <div class="dim-score">${dimAvgs[i]}/5</div>
+        </div>
+        <div class="dim-bg"><div class="dim-fill" style="width:${pct}%;"></div></div>
+      </div>`;
   });
 
+  // ── Chart: Radar ──
   charts.radar = new Chart(document.getElementById('chart-radar'), {
     type: 'radar',
-    data: { labels: dimLabels, datasets: [{ label: 'Promedio', data: dimAvgs, backgroundColor: 'rgba(255,91,0,0.1)', borderColor: '#FF5B00', borderWidth: 2, pointBackgroundColor: '#FF5B00', pointRadius: 4 }] },
-    options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, color: '#8A9099', backdropColor: 'transparent' }, grid: { color: 'rgba(33,39,42,0.08)' }, angleLines: { color: 'rgba(33,39,42,0.08)' }, pointLabels: { color: '#3C464B', font: { size: 11, weight: '500' } } } }, plugins: { legend: { display: false } } }
+    data: {
+      labels: dimLabels,
+      datasets: [{ label:'Promedio', data:dimAvgs,
+        backgroundColor:'rgba(255,91,0,0.1)', borderColor:'#FF5B00',
+        borderWidth:2, pointBackgroundColor:'#FF5B00', pointRadius:4 }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      scales: { r: {
+        min:0, max:5,
+        ticks:{ stepSize:1, color:'#8A9099', backdropColor:'transparent' },
+        grid:{ color:'rgba(33,39,42,0.08)' },
+        angleLines:{ color:'rgba(33,39,42,0.08)' },
+        pointLabels:{ color:'#3C464B', font:{ size:12, weight:'600' } }
+      }},
+      plugins:{ legend:{ display:false } }
+    }
   });
 
+  // ── Chart: Timeline ──
   const byDay = {};
   norm.forEach(r => {
     const raw = r.timestamp || ''; let dateKey = '';
-    if (raw.includes('/')) { const p = raw.split(' ')[0].split('/'); dateKey = p.length===3?`${p[2]}-${p[1]}-${p[0]}`:raw.split(' ')[0]; } else { dateKey = raw.split('T')[0]; }
+    if (raw.includes('/')) { const p=raw.split(' ')[0].split('/'); dateKey=p.length===3?`${p[2]}-${p[1]}-${p[0]}`:raw.split(' ')[0]; }
+    else { dateKey = raw.split('T')[0]; }
     if (!dateKey) return;
-    if (!byDay[dateKey]) byDay[dateKey] = [];
+    if (!byDay[dateKey]) byDay[dateKey]=[];
     byDay[dateKey].push(r.score_total);
   });
   const sortedDays = Object.keys(byDay).sort();
   const dayAvgs    = sortedDays.map(d => +(byDay[d].reduce((a,b)=>a+b,0)/byDay[d].length).toFixed(1));
   charts.timeline = new Chart(document.getElementById('chart-timeline'), {
-    type: 'line',
-    data: { labels: sortedDays, datasets: [{ label: 'Score promedio', data: dayAvgs, borderColor: '#FF5B00', backgroundColor: 'rgba(255,91,0,0.07)', borderWidth: 2, pointBackgroundColor: '#FF5B00', pointRadius: 3, fill: true, tension: 0.4 }] },
-    options: { responsive: true, maintainAspectRatio: false, scales: { y: { min:0, max:20, grid:{color:'rgba(33,39,42,0.06)'}, ticks:{color:'#8A9099'} }, x: { grid:{display:false}, ticks:{color:'#8A9099',maxRotation:45} } }, plugins:{legend:{display:false}} }
+    type:'line',
+    data:{ labels:sortedDays, datasets:[{ label:'Score promedio', data:dayAvgs,
+      borderColor:'#FF5B00', backgroundColor:'rgba(255,91,0,0.07)',
+      borderWidth:2, pointBackgroundColor:'#FF5B00', pointRadius:3, fill:true, tension:0.4 }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      scales:{ y:{min:0,max:20,grid:{color:'rgba(33,39,42,0.06)'},ticks:{color:'#8A9099'}},
+               x:{grid:{display:false},ticks:{color:'#8A9099',maxRotation:45}} },
+      plugins:{legend:{display:false}} }
   });
 
+  // ── Chart: Histograma ──
   const buckets      = ['1–4','5–8','9–12','13–16','17–20'];
   const bucketColors = ['#dc2626','#FF5B00','#d97706','#84cc16','#16a34a'];
   const bucketCounts = [0,0,0,0,0];
   scores.forEach(s => { if(s<=4)bucketCounts[0]++; else if(s<=8)bucketCounts[1]++; else if(s<=12)bucketCounts[2]++; else if(s<=16)bucketCounts[3]++; else bucketCounts[4]++; });
   charts.hist = new Chart(document.getElementById('chart-hist'), {
-    type: 'bar',
-    data: { labels: buckets, datasets: [{ label:'Diagnósticos', data:bucketCounts, backgroundColor:bucketColors, borderRadius:6, borderSkipped:false }] },
-    options: { responsive:true, maintainAspectRatio:false, scales: { y:{grid:{color:'rgba(33,39,42,0.06)'},ticks:{color:'#8A9099',stepSize:1}}, x:{grid:{display:false},ticks:{color:'#8A9099'}} }, plugins:{legend:{display:false}} }
+    type:'bar',
+    data:{ labels:buckets, datasets:[{ label:'Diagnósticos', data:bucketCounts, backgroundColor:bucketColors, borderRadius:6, borderSkipped:false }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      scales:{ y:{grid:{color:'rgba(33,39,42,0.06)'},ticks:{color:'#8A9099',stepSize:1}},
+               x:{grid:{display:false},ticks:{color:'#8A9099'}} },
+      plugins:{legend:{display:false}} }
   });
 
+  // ── Chart: Score % por dimensión ──
+  const dimPctAvgs = dimAvgs.map(a=>+((a/5)*100).toFixed(1));
+  charts.dimsBar = new Chart(document.getElementById('chart-dims-bar'), {
+    type:'bar',
+    data:{ labels:dimShort, datasets:[{ label:'% Promedio', data:dimPctAvgs,
+      backgroundColor:dimPctAvgs.map(v=>v<=20?'#dc2626':v<=40?'#FF5B00':v<=60?'#d97706':'#16a34a'),
+      borderRadius:6, borderSkipped:false }] },
+    options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      scales:{ x:{min:0,max:100,grid:{color:'rgba(33,39,42,0.06)'},ticks:{color:'#8A9099',callback:v=>v+'%'}},
+               y:{grid:{display:false},ticks:{color:'#3C464B'}} },
+      plugins:{legend:{display:false}} }
+  });
+
+  // ── Chart: Por semana ──
   const byWeek = {};
   norm.forEach(r => {
-    const raw = r.timestamp||''; let d;
-    if(raw.includes('/')){ const p=raw.split(' ')[0].split('/'); d=p.length===3?new Date(`${p[2]}-${p[1]}-${p[0]}`):new Date(); } else { d=new Date(raw); }
+    const raw=r.timestamp||''; let d;
+    if(raw.includes('/')){ const p=raw.split(' ')[0].split('/'); d=p.length===3?new Date(`${p[2]}-${p[1]}-${p[0]}`):new Date(); }
+    else { d=new Date(raw); }
     if(isNaN(d)) return;
     const week=getWeekKey(d); byWeek[week]=(byWeek[week]||0)+1;
   });
   const sortedWeeks = Object.keys(byWeek).sort();
   charts.weekly = new Chart(document.getElementById('chart-weekly'), {
     type:'bar',
-    data:{ labels:sortedWeeks, datasets:[{ label:'Diagnósticos', data:sortedWeeks.map(w=>byWeek[w]), backgroundColor:'rgba(255,91,0,0.7)', borderColor:'#FF5B00', borderWidth:1, borderRadius:6, borderSkipped:false }] },
-    options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{grid:{color:'rgba(33,39,42,0.06)'},ticks:{color:'#8A9099',stepSize:1}}, x:{grid:{display:false},ticks:{color:'#8A9099',maxRotation:45}} }, plugins:{legend:{display:false}} }
-  });
-
-  const dimPctAvgs = dimAvgs.map(a=>+((a/5)*100).toFixed(1));
-  charts.dimsBar = new Chart(document.getElementById('chart-dims-bar'), {
-    type:'bar',
-    data:{ labels:dimShort, datasets:[{ label:'% Promedio', data:dimPctAvgs, backgroundColor:dimPctAvgs.map(v=>v<=20?'#dc2626':v<=40?'#FF5B00':v<=60?'#d97706':'#16a34a'), borderRadius:6, borderSkipped:false }] },
-    options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y', scales:{ x:{min:0,max:100,grid:{color:'rgba(33,39,42,0.06)'},ticks:{color:'#8A9099',callback:v=>v+'%'}}, y:{grid:{display:false},ticks:{color:'#3C464B'}} }, plugins:{legend:{display:false}} }
+    data:{ labels:sortedWeeks, datasets:[{ label:'Diagnósticos',
+      data:sortedWeeks.map(w=>byWeek[w]),
+      backgroundColor:'rgba(255,91,0,0.7)', borderColor:'#FF5B00',
+      borderWidth:1, borderRadius:6, borderSkipped:false }] },
+    options:{ responsive:true, maintainAspectRatio:false,
+      scales:{ y:{grid:{color:'rgba(33,39,42,0.06)'},ticks:{color:'#8A9099',stepSize:1}},
+               x:{grid:{display:false},ticks:{color:'#8A9099',maxRotation:45}} },
+      plugins:{legend:{display:false}} }
   });
 }
 
@@ -504,6 +596,7 @@ function getWeekKey(date) {
   const mon=new Date(d.setDate(diff));
   return mon.toISOString().split('T')[0];
 }
+
 loadData();
 </script>
 </body>
