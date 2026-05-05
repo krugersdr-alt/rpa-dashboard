@@ -277,6 +277,7 @@
   <div class="topbar-right">
     <span class="last-update" id="last-update">Cargando...</span>
     <button class="btn-refresh" onclick="loadData()">↻ Actualizar</button>
+    <button class="btn-refresh" id="btn-stop" onclick="toggleAuto()">⏸ Detener</button>
   </div>
 </div>
 
@@ -595,6 +596,26 @@ function getWeekKey(date) {
   const diff=d.getDate()-day+(day===0?-6:1);
   const mon=new Date(d.setDate(diff));
   return mon.toISOString().split('T')[0];
+}
+
+let autoInterval = setInterval(loadData, 20000);
+let autoRunning = true;
+
+function toggleAuto() {
+  const btn = document.getElementById("btn-stop");
+  if (autoRunning) {
+    clearInterval(autoInterval);
+    autoRunning = false;
+    btn.textContent = "▶ Reanudar";
+    btn.style.borderColor = "#16a34a";
+    btn.style.color = "#16a34a";
+  } else {
+    autoInterval = setInterval(loadData, 20000);
+    autoRunning = true;
+    btn.textContent = "⏸ Detener";
+    btn.style.borderColor = "";
+    btn.style.color = "";
+  }
 }
 
 loadData();
