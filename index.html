@@ -118,21 +118,18 @@
   .error-state p { color: var(--muted2); font-size: .9rem; margin-top: .5rem; }
 
   /* ══════════════════════════════════════════════
-     TOP ZONE
-     LEFT  = radar card (más alto)
-     RIGHT = 3 KPI cards + Dimensión más crítica
-             todos del mismo ancho, apilados
+     
   ══════════════════════════════════════════════ */
   .top-zone {
     display: grid;
     grid-template-columns: 1fr 300px;
     gap: 1.25rem;
     margin-bottom: 1.25rem;
-    align-items: stretch; /* ambas columnas la misma altura */
+    align-items: stretch; 
   }
   @media (max-width: 960px) { .top-zone { grid-template-columns: 1fr; } }
 
-  /* Radar card — más alta */
+ 
   .radar-card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -146,13 +143,13 @@
   }
   .radar-card:hover { border-color: var(--border2); box-shadow: 0 6px 24px rgba(255,91,0,.07); }
 
-  /* El canvas del radar ocupa todo el espacio disponible */
+ 
   .radar-card .chart-wrap {
     flex: 1;
-    min-height: 420px; /* altura mínima generosa */
+    min-height: 420px; 
   }
 
-  /* Columna derecha: KPIs + dim crítica apilados */
+  
   .right-stack {
     display: flex;
     flex-direction: column;
@@ -191,7 +188,7 @@
   .kpi-value.orange { color: var(--orange); }
   .kpi-sub { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
 
-  /* Dimensión más crítica — dentro del right-stack, crece para llenar */
+  /* Dimensión más crítica  */
   .dim-critica-card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -321,8 +318,7 @@
   <div id="dashboard" style="display:none;">
 
     <!-- ══ TOP ZONE ══
-         Izquierda: Radar (más alto)
-         Derecha:   3 KPIs + Dimensión más crítica (mismo ancho, apilados)
+         
     -->
     <div class="top-zone">
 
@@ -361,7 +357,7 @@
           </div>
         </div>
 
-        <!-- Dimensión más crítica — ocupa el espacio restante -->
+        <!-- Dimensión más crítica -->
         <div class="dim-critica-card">
           <div class="chart-title">Dimensión más Crítica</div>
           <div class="dim-critica-inner">
@@ -378,9 +374,7 @@
     </div><!-- /top-zone -->
 
     <!-- ══ ANÁLISIS DE MADUREZ ══
-         Izquierda: Distribución por nivel (full-width de su columna)
-         Derecha:   Diagnósticos por Semana
-         (Evolución del Score Promedio eliminada de esta fila)
+         
     -->
     <div class="section-label">Análisis de madurez</div>
 
