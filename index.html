@@ -49,9 +49,7 @@
     pointer-events: none; z-index: 0;
   }
 
-  /* ══════════════════════════════════
-     TOPBAR — dark
-  ══════════════════════════════════ */
+  /* ══ TOPBAR ══ */
   .topbar {
     position: sticky; top: 0; z-index: 100;
     background: #0f1315;
@@ -108,7 +106,7 @@
   }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.75)} }
 
-  /* ── LOADING / ERROR ── */
+  /* ── LOADING ── */
   #loading-state { text-align: center; padding: 6rem 0; }
   .loader-ring {
     width: 48px; height: 48px; border: 3px solid var(--border);
@@ -120,20 +118,21 @@
   .error-state p { color: var(--muted2); font-size: .9rem; margin-top: .5rem; }
 
   /* ══════════════════════════════════════════════
-     TOP ZONE — two columns:
-     LEFT  = radar (fills height)
-     RIGHT = 3 KPI cards stacked
+     TOP ZONE
+     LEFT  = radar card (más alto)
+     RIGHT = 3 KPI cards + Dimensión más crítica
+             todos del mismo ancho, apilados
   ══════════════════════════════════════════════ */
   .top-zone {
     display: grid;
     grid-template-columns: 1fr 300px;
     gap: 1.25rem;
     margin-bottom: 1.25rem;
-    align-items: start;
+    align-items: stretch; /* ambas columnas la misma altura */
   }
   @media (max-width: 960px) { .top-zone { grid-template-columns: 1fr; } }
 
-  /* Radar card */
+  /* Radar card — más alta */
   .radar-card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -142,14 +141,26 @@
     box-shadow: 0 2px 8px rgba(33,39,42,.05);
     transition: border-color .25s, box-shadow .25s;
     animation: fadeUp .5s ease both;
+    display: flex;
+    flex-direction: column;
   }
   .radar-card:hover { border-color: var(--border2); box-shadow: 0 6px 24px rgba(255,91,0,.07); }
 
-  /* KPI stack */
-  .kpi-stack {
-    display: flex; flex-direction: column; gap: 1rem;
+  /* El canvas del radar ocupa todo el espacio disponible */
+  .radar-card .chart-wrap {
+    flex: 1;
+    min-height: 420px; /* altura mínima generosa */
+  }
+
+  /* Columna derecha: KPIs + dim crítica apilados */
+  .right-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     animation: fadeUp .5s .08s ease both;
   }
+
+  /* KPI card */
   .kpi-card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -158,9 +169,9 @@
     position: relative; overflow: hidden;
     transition: border-color .25s, transform .25s, box-shadow .25s;
     box-shadow: 0 2px 8px rgba(33,39,42,.05);
+    flex-shrink: 0;
   }
   .kpi-card:hover { border-color: var(--border2); transform: translateX(3px); box-shadow: 0 6px 24px rgba(255,91,0,.10); }
-  /* left orange accent bar */
   .kpi-card::before {
     content: '';
     position: absolute; top: 12%; left: 0; bottom: 12%;
@@ -180,9 +191,21 @@
   .kpi-value.orange { color: var(--orange); }
   .kpi-sub { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
 
-  /* ══════════════════════════════════
-     ANALYSIS SECTION — below
-  ══════════════════════════════════ */
+  /* Dimensión más crítica — dentro del right-stack, crece para llenar */
+  .dim-critica-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(33,39,42,.05);
+    transition: border-color .25s, box-shadow .25s;
+    flex: 1; /* ocupa el espacio restante */
+    display: flex;
+    flex-direction: column;
+  }
+  .dim-critica-card:hover { border-color: var(--border2); box-shadow: 0 6px 24px rgba(255,91,0,.07); }
+
+  /* ══ SECCIÓN ANÁLISIS ══ */
   .section-label {
     font-size: .65rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: 1.5px; color: var(--muted);
@@ -224,10 +247,10 @@
   .nivel-bar-fill { height: 100%; border-radius: 7px; transition: width 1s ease .3s; }
   .nivel-pct { font-size: .82rem; font-weight: 700; min-width: 44px; text-align: right; }
 
-  /* ── DIM CRÍTICA ── */
+  /* ── DIM CRÍTICA inner ── */
   .dim-critica-inner {
     display: flex; flex-direction: column; align-items: center;
-    justify-content: center; padding: 1.5rem 0; gap: .4rem;
+    justify-content: center; flex: 1; gap: .4rem;
   }
   .dim-critica-badge {
     background: var(--orange-pale); border: 1px solid var(--border2);
@@ -265,7 +288,7 @@
 </head>
 <body>
 
-<!-- TOPBAR — dark -->
+<!-- TOPBAR -->
 <div class="topbar">
   <div class="topbar-left">
     <img
@@ -297,19 +320,23 @@
 
   <div id="dashboard" style="display:none;">
 
-    <!-- ══ TOP ZONE: Radar (izquierda) + KPIs apilados (derecha) ══ -->
+    <!-- ══ TOP ZONE ══
+         Izquierda: Radar (más alto)
+         Derecha:   3 KPIs + Dimensión más crítica (mismo ancho, apilados)
+    -->
     <div class="top-zone">
 
-      <!-- Radar -->
+      <!-- Radar — izquierda -->
       <div class="radar-card">
         <div class="chart-title">Radar de Dimensiones Promedio</div>
-        <div class="chart-wrap" style="height:340px;">
+        <div class="chart-wrap">
           <canvas id="chart-radar"></canvas>
         </div>
       </div>
 
-      <!-- KPI stack -->
-      <div class="kpi-stack">
+      <!-- Columna derecha: KPIs + Dim crítica -->
+      <div class="right-stack">
+
         <div class="kpi-card">
           <div class="kpi-inner">
             <div class="kpi-label">Total Diagnósticos</div>
@@ -317,6 +344,7 @@
             <div class="kpi-sub">respuestas registradas</div>
           </div>
         </div>
+
         <div class="kpi-card">
           <div class="kpi-inner">
             <div class="kpi-label">Score Promedio</div>
@@ -324,6 +352,7 @@
             <div class="kpi-sub">de 20 puntos posibles</div>
           </div>
         </div>
+
         <div class="kpi-card">
           <div class="kpi-inner">
             <div class="kpi-label">Madurez Promedio</div>
@@ -331,47 +360,49 @@
             <div class="kpi-sub">% sobre score máximo</div>
           </div>
         </div>
-      </div>
+
+        <!-- Dimensión más crítica — ocupa el espacio restante -->
+        <div class="dim-critica-card">
+          <div class="chart-title">Dimensión más Crítica</div>
+          <div class="dim-critica-inner">
+            <div class="dim-critica-badge">Mayor atención requerida</div>
+            <div id="dim-critica-nombre">—</div>
+            <div class="dim-critica-label">menor score promedio</div>
+            <div id="dim-critica-score">—</div>
+            <div class="dim-critica-sublabel">promedio sobre 5</div>
+          </div>
+        </div>
+
+      </div><!-- /right-stack -->
 
     </div><!-- /top-zone -->
 
-    <!-- ══ ANÁLISIS DE MADUREZ ══ -->
+    <!-- ══ ANÁLISIS DE MADUREZ ══
+         Izquierda: Distribución por nivel (full-width de su columna)
+         Derecha:   Diagnósticos por Semana
+         (Evolución del Score Promedio eliminada de esta fila)
+    -->
     <div class="section-label">Análisis de madurez</div>
 
-    <div class="charts-row charts-row-21">
+    <div class="charts-row charts-row-2">
+      <!-- Distribución por nivel -->
       <div class="chart-card">
         <div class="chart-title">Distribución por Nivel de Madurez</div>
         <div class="nivel-list" id="nivel-list"></div>
       </div>
+
+      <!-- Diagnósticos por Semana ocupa el lugar de Evolución -->
       <div class="chart-card">
-        <div class="chart-title">Dimensión más Crítica</div>
-        <div class="dim-critica-inner">
-          <div class="dim-critica-badge">Mayor atención requerida</div>
-          <div id="dim-critica-nombre">—</div>
-          <div class="dim-critica-label">menor score promedio</div>
-          <div id="dim-critica-score">—</div>
-          <div class="dim-critica-sublabel">promedio sobre 5</div>
-        </div>
+        <div class="chart-title">Diagnósticos por Semana</div>
+        <div class="chart-wrap" style="height:260px;"><canvas id="chart-weekly"></canvas></div>
       </div>
     </div>
 
+    <!-- Score por dimensión + Detalle % -->
     <div class="charts-row charts-row-2">
-      <div class="chart-card">
-        <div class="chart-title">Evolución del Score Promedio</div>
-        <div class="chart-wrap" style="height:260px;"><canvas id="chart-timeline"></canvas></div>
-      </div>
       <div class="chart-card">
         <div class="chart-title">Score Promedio por Dimensión</div>
         <div class="dim-list" id="dim-list"></div>
-      </div>
-    </div>
-
-    <div class="section-label">Detalle dimensional</div>
-
-    <div class="charts-row charts-row-2">
-      <div class="chart-card">
-        <div class="chart-title">Distribución de Scores</div>
-        <div class="chart-wrap" style="height:240px;"><canvas id="chart-hist"></canvas></div>
       </div>
       <div class="chart-card">
         <div class="chart-title">Score por Dimensión — Detalle %</div>
@@ -379,10 +410,17 @@
       </div>
     </div>
 
-    <div class="charts-row" style="grid-template-columns:1fr;">
+    <div class="section-label">Detalle dimensional</div>
+
+    <!-- Histograma + Evolución del Score (movida aquí abajo) -->
+    <div class="charts-row charts-row-2">
       <div class="chart-card">
-        <div class="chart-title">Diagnósticos por Semana</div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="chart-weekly"></canvas></div>
+        <div class="chart-title">Distribución de Scores</div>
+        <div class="chart-wrap" style="height:240px;"><canvas id="chart-hist"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Evolución del Score Promedio</div>
+        <div class="chart-wrap" style="height:240px;"><canvas id="chart-timeline"></canvas></div>
       </div>
     </div>
 
@@ -426,14 +464,14 @@ function renderDashboard(rows) {
   Object.values(charts).forEach(c => c.destroy()); charts = {};
 
   const norm = rows.map(r => ({
-    timestamp:        r.timestamp        || r['Fecha y hora']                     || '',
-    score_total:      Number(r.score_total      || r['Score Total'])               || 0,
-    score_pct:        Number(r.score_pct        || r['Score %'])                   || 0,
-    nivel:            r.nivel            || r['Nivel']                             || '',
-    dim_dependencia:  Number(r.dim_dependencia  || r['Dependencia manual (pts)'])  || 0,
-    dim_conocimiento: Number(r.dim_conocimiento || r['Conocimiento crítico (pts)'])|| 0,
+    timestamp:        r.timestamp        || r['Fecha y hora']                      || '',
+    score_total:      Number(r.score_total      || r['Score Total'])                || 0,
+    score_pct:        Number(r.score_pct        || r['Score %'])                    || 0,
+    nivel:            r.nivel            || r['Nivel']                              || '',
+    dim_dependencia:  Number(r.dim_dependencia  || r['Dependencia manual (pts)'])   || 0,
+    dim_conocimiento: Number(r.dim_conocimiento || r['Conocimiento crítico (pts)']) || 0,
     dim_complejidad:  Number(r.dim_complejidad  || r['Complejidad y volumen (pts)'])|| 0,
-    dim_calidad:      Number(r.dim_calidad      || r['Calidad y riesgo (pts)'])    || 0,
+    dim_calidad:      Number(r.dim_calidad      || r['Calidad y riesgo (pts)'])     || 0,
   }));
 
   const scores  = norm.map(r => r.score_total);
@@ -476,7 +514,7 @@ function renderDashboard(rows) {
       </div>`;
   });
 
-  // ── Dimensión más crítica = MENOR promedio ──
+  // ── Dimensión más crítica ──
   const minIdx = dimAvgs.indexOf(Math.min(...dimAvgs));
   document.getElementById('dim-critica-nombre').textContent = dimShort[minIdx];
   document.getElementById('dim-critica-score').textContent  = dimAvgs[minIdx] + '/5';
@@ -496,29 +534,30 @@ function renderDashboard(rows) {
       </div>`;
   });
 
-  // ── Chart: Radar ──
+  // ── Chart: Radar — más alto ──
   charts.radar = new Chart(document.getElementById('chart-radar'), {
     type: 'radar',
     data: {
       labels: dimLabels,
       datasets: [{ label:'Promedio', data:dimAvgs,
         backgroundColor:'rgba(255,91,0,0.1)', borderColor:'#FF5B00',
-        borderWidth:2, pointBackgroundColor:'#FF5B00', pointRadius:4 }]
+        borderWidth:2, pointBackgroundColor:'#FF5B00', pointRadius:5 }]
     },
     options: {
-      responsive:true, maintainAspectRatio:false,
+      responsive: true,
+      maintainAspectRatio: false,
       scales: { r: {
         min:0, max:5,
-        ticks:{ stepSize:1, color:'#8A9099', backdropColor:'transparent' },
+        ticks:{ stepSize:1, color:'#8A9099', backdropColor:'transparent', font:{ size:11 } },
         grid:{ color:'rgba(33,39,42,0.08)' },
         angleLines:{ color:'rgba(33,39,42,0.08)' },
-        pointLabels:{ color:'#3C464B', font:{ size:12, weight:'600' } }
+        pointLabels:{ color:'#3C464B', font:{ size:13, weight:'600' } }
       }},
       plugins:{ legend:{ display:false } }
     }
   });
 
-  // ── Chart: Timeline ──
+  // ── Chart: Timeline (movido a detalle dimensional) ──
   const byDay = {};
   norm.forEach(r => {
     const raw = r.timestamp || ''; let dateKey = '';
@@ -568,7 +607,7 @@ function renderDashboard(rows) {
       plugins:{legend:{display:false}} }
   });
 
-  // ── Chart: Por semana ──
+  // ── Chart: Por semana (ahora en análisis de madurez) ──
   const byWeek = {};
   norm.forEach(r => {
     const raw=r.timestamp||''; let d;
